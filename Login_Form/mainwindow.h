@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include "window1.h"
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -16,9 +16,10 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;
+    window1 *obj;
 };
 #endif // MAINWINDOW_H
