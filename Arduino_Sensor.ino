@@ -12,7 +12,7 @@ start_time=  millis(); //current time
 }
 
 void loop() {
-  int flag=0;int flag2=0;int flag3=0;
+  int flag=0;int flag2=0;
  
  //Serial.print(time1);
  if(analogRead(pulse_sensor)<=55 || analogRead(pulse_sensor)>=140)
