@@ -14,8 +14,8 @@ int UpperThreshold = 518;
     unsigned long PulseInterval = 0;
 
 
-const char* ssid = "****"; //Your Network SSID
-const char* password = "****"; //Your Network Password
+const char* ssid = "***"; //Your Network SSID
+const char* password = "*******"; //Your Network Password
 int val;
 int PulseSensorpin = A0; //Pulse Sensor Pin Connected at A0 Pin
 int buzzer=8;
@@ -23,8 +23,8 @@ int buzzer=8;
 WiFiClient client;
 unsigned long start_time;
 unsigned long time1;
-unsigned long myChannelNumber = ***** ; //Your Channel Number (Without Brackets)
-const char * myWriteAPIKey ="******"; //Your Write API Key
+unsigned long myChannelNumber = *** ; //Your Channel Number (Without Brackets)
+const char * myWriteAPIKey ="*******"; //Your Write API Key
 
 void setup()
 {
@@ -63,10 +63,7 @@ void loop()
 
       BPM = (1.0/PulseInterval) * 60.0 * 1000;
 
-      Serial.print(reading);
-      Serial.print("\t");
-      Serial.print(PulseInterval);
-      Serial.print("\t");
+  
       Serial.print(BPM);
       Serial.println(" BPM");
       Serial.flush();
@@ -77,9 +74,9 @@ void loop()
  int flag=1; //counter variable to check the condition
  // val = (analogRead(PulseSensorpin)); //Read Analog values and Store in val variable
   Serial.println("Pulse Sensorvalue=  "); // Start Printing on Pulse sensor value on LCD
-  Serial.println(val); // Start Printing on Pulse sensor value on LCD
+  
   delay(10);
-  ThingSpeak.writeField(myChannelNumber, 1,val, myWriteAPIKey); //Update in ThingSpeak
+  ThingSpeak.writeField(myChannelNumber, 1,BPM, myWriteAPIKey); //Update in ThingSpeak
  
   if(BPM<=140 || BPM >=55)
   {
