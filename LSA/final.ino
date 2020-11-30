@@ -3,12 +3,18 @@
 #include <WiFiClient.h>;
 #include <ThingSpeak.h>;
 
+#define USE_ARDUINO_INTERRUPTS true // Set-up low-level interrupts for most acurate BPM math.
+#include <PulseSensorPlayground.h>
 
 const char* ssid = "***"; //Your Network SSID
 const char* password = "******"; //Your Network Password
 int val;
 int PulseSensorpin = A0; //Pulse Sensor Pin Connected at A0 Pin
 int buzzer=8;
+
+int PulseWire = 0;
+int Threshold = 550;
+PulseSensorPlayground pulseSensor;
 
 WiFiClient client;
 unsigned long start_time;
@@ -19,6 +25,11 @@ const char * myWriteAPIKey = "***********"; //Your Write API Key
 void setup()
 {
  Serial.begin(9600);
+ 
+ pulseSensor.analogInput(PulseWire);
+pulseSensor.setThreshold(Threshold);
+pulseSensor.begin();
+ 
  start_time=millis(); //Starting the timer
  
  delay(10);
@@ -29,14 +40,17 @@ void setup()
 
 void loop()
 {
+ 
+ val = pulseSensor.getBeatsPerMinute(); // Calls function on our pulseSensor object that returns BPM as an "int".
+
  int flag=1; //counter variable to check the condition
-  val = (analogRead(PulseSensorpin)); //Read Analog values and Store in val variable
+  //val = (analogRead(PulseSensorpin)); //Read Analog values and Store in val variable
   Serial.println("Pulse Sensorvalue=  "); // Start Printing on Pulse sensor value on LCD
   Serial.println(val); // Start Printing on Pulse sensor value on LCD
   delay(10);
   ThingSpeak.writeField(myChannelNumber, 1,val, myWriteAPIKey); //Update in ThingSpeak
  
-  if(val<=635 || val >=520)
+   if(val<=635 || val >=520)
   {
   while(flag==1)
   {
