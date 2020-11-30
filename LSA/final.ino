@@ -3,33 +3,32 @@
 #include <WiFiClient.h>;
 #include <ThingSpeak.h>;
 
-#define USE_ARDUINO_INTERRUPTS true // Set-up low-level interrupts for most acurate BPM math.
-#include <PulseSensorPlayground.h>
+int UpperThreshold = 518;
+    int LowerThreshold = 490;
+    int reading = 0;
+    float BPM = 0.0;
+    bool IgnoreReading = false;
+    bool FirstPulseDetected = false;
+    unsigned long FirstPulseTime = 0;
+    unsigned long SecondPulseTime = 0;
+    unsigned long PulseInterval = 0;
 
-const char* ssid = "***"; //Your Network SSID
-const char* password = "******"; //Your Network Password
+
+const char* ssid = "****"; //Your Network SSID
+const char* password = "****"; //Your Network Password
 int val;
 int PulseSensorpin = A0; //Pulse Sensor Pin Connected at A0 Pin
 int buzzer=8;
 
-int PulseWire = 0;
-int Threshold = 550;
-PulseSensorPlayground pulseSensor;
-
 WiFiClient client;
 unsigned long start_time;
 unsigned long time1;
-unsigned long myChannelNumber = ******* ; //Your Channel Number (Without Brackets)
-const char * myWriteAPIKey = "***********"; //Your Write API Key
+unsigned long myChannelNumber = ***** ; //Your Channel Number (Without Brackets)
+const char * myWriteAPIKey ="******"; //Your Write API Key
 
 void setup()
 {
  Serial.begin(9600);
- 
- pulseSensor.analogInput(PulseWire);
-pulseSensor.setThreshold(Threshold);
-pulseSensor.begin();
- 
  start_time=millis(); //Starting the timer
  
  delay(10);
@@ -40,17 +39,49 @@ pulseSensor.begin();
 
 void loop()
 {
- 
- val = pulseSensor.getBeatsPerMinute(); // Calls function on our pulseSensor object that returns BPM as an "int".
 
+  reading = analogRead(0); 
+
+      // Heart beat leading edge detected.
+      if(reading > UpperThreshold && IgnoreReading == false){
+        if(FirstPulseDetected == false){
+          FirstPulseTime = millis();
+          FirstPulseDetected = true;
+        }
+        else{
+          SecondPulseTime = millis();
+          PulseInterval = SecondPulseTime - FirstPulseTime;
+          FirstPulseTime = SecondPulseTime;
+        }
+        IgnoreReading = true;
+      }
+
+      // Heart beat trailing edge detected.
+      if(reading < LowerThreshold){
+        IgnoreReading = false;
+      }  
+
+      BPM = (1.0/PulseInterval) * 60.0 * 1000;
+
+      Serial.print(reading);
+      Serial.print("\t");
+      Serial.print(PulseInterval);
+      Serial.print("\t");
+      Serial.print(BPM);
+      Serial.println(" BPM");
+      Serial.flush();
+
+      // Please don't use delay() - this is just for testing purposes.
+      delay(50);
+      
  int flag=1; //counter variable to check the condition
-  //val = (analogRead(PulseSensorpin)); //Read Analog values and Store in val variable
+ // val = (analogRead(PulseSensorpin)); //Read Analog values and Store in val variable
   Serial.println("Pulse Sensorvalue=  "); // Start Printing on Pulse sensor value on LCD
   Serial.println(val); // Start Printing on Pulse sensor value on LCD
   delay(10);
   ThingSpeak.writeField(myChannelNumber, 1,val, myWriteAPIKey); //Update in ThingSpeak
  
-   if(val<=635 || val >=520)
+  if(BPM<=140 || BPM >=55)
   {
   while(flag==1)
   {
@@ -61,7 +92,7 @@ void loop()
     digitalWrite(buzzer, HIGH);
     while (get_http(String("Critical")) != 0);
     }
-    if(val<=635 || val>=520)
+    if(BPM<=140 || BPM>=55)
     {
       flag=0;
       break;
