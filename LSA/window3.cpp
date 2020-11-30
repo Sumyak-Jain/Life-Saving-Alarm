@@ -20,7 +20,7 @@ window3::~window3()
 
 void window3::on_pushButton_3_clicked()
 {
-    QString link="https://thingspeak.com/channels/1220585";
+    QString link="https://thingspeak.com/channels/1245745";
         QDesktopServices ::openUrl(QUrl(link));
 
 }
